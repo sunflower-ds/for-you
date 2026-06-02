@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For You ♡</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0d0d1a;
+      color: #f5e6ff;
+      font-family: 'Georgia', serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 36px 16px 80px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: normal;
+      letter-spacing: 0.08em;
+      color: #e8bfff;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 0.82rem;
+      color: #9980b3;
+      margin-bottom: 28px;
+      text-align: center;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Countdown ── */
+    #countdown-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(232,191,255,0.18);
+      border-radius: 14px;
+      padding: 10px 28px;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    #countdown-label { font-size: 0.78rem; color: #9980b3; letter-spacing: 0.06em; }
+    #countdown-timer { font-size: 1.35rem; color: #e8bfff; font-family: 'Courier New', monospace; margin-top: 4px; }
+
+    /* ── Day grid ── */
+    #day-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      max-width: 560px;
+      margin-bottom: 36px;
+    }
+
+    .day-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(232,191,255,0.25);
+      background: rgba(255,255,255,0.03);
+      color: #c8a0e8;
+      font-size: 0.82rem;
+      font-family: 'Georgia', serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .day-btn:hover:not(.locked) {
+      background: rgba(232,191,255,0.14);
+      border-color: #e8bfff;
+      color: #fff;
+      transform: scale(1.1);
+    }
+    .day-btn.active {
+      background: rgba(232,191,255,0.22);
+      border-color: #e8bfff;
+      color: #fff;
+      box-shadow: 0 0 14px rgba(232,191,255,0.28);
+    }
+    .day-btn.today {
+      border-color: #ff9fcf;
+      color: #ff9fcf;
+      box-shadow: 0 0 10px rgba(255,159,207,0.22);
+    }
+    .day-btn.locked { opacity: 0.2; cursor: not-allowed; }
+
+    /* ── Message card ── */
+    #message-card {
+      max-width: 580px;
+      width: 100%;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(232,191,255,0.18);
+      border-radius: 22px;
+      padding: 36px 32px;
+      display: none;
+      animation: fadeUp 0.4s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #message-day-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      color: #9980b3;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    #message-topic {
+      font-size: 1.55rem;
+      color: #e8bfff;
+      margin-bottom: 24px;
+    }
+    #message-topic::before { content: '♡ '; font-size: 0.95rem; color: #ff9fcf; }
+
+    /* ── Photo ── */
+    #photo-wrap {
+      display: none;
+      margin-bottom: 24px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(232,191,255,0.15);
+    }
+    #photo-wrap img {
+      width: 100%;
+      display: block;
+      max-height: 420px;
+      object-fit: cover;
+    }
+    #photo-caption {
+      font-size: 0.78rem;
+      color: #9980b3;
+      font-style: italic;
+      padding: 8px 14px;
+      background: rgba(0,0,0,0.25);
+      text-align: center;
+    }
+
+    /* ── Text message ── */
+    #message-body {
+      font-size: 1rem;
+      line-height: 1.9;
+      color: #ddd0ef;
+      white-space: pre-wrap;
+      display: none;
+    }
+
+    /* ── Poem ── */
+    #poem-wrap {
+      display: none;
+      border-left: 2px solid rgba(255,159,207,0.4);
+      padding: 4px 0 4px 20px;
+      margin-bottom: 4px;
+    }
+    #poem-body {
+      font-size: 1rem;
+      line-height: 2;
+      color: #e8d8f8;
+      font-style: italic;
+      white-space: pre-wrap;
+    }
+    #poem-title {
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      color: #9980b3;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* ── Audio player ── */
+    #audio-wrap {
+      display: none;
+      margin-top: 28px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(232,191,255,0.15);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+    #audio-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      color: #9980b3;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* custom audio player */
+    .audio-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    #play-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(232,191,255,0.4);
+      background: rgba(232,191,255,0.1);
+      color: #e8bfff;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    #play-btn:hover { background: rgba(232,191,255,0.2); }
+
+    .progress-wrap {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff9fcf, #e8bfff);
+      border-radius: 2px;
+      transition: width 0.1s linear;
+      pointer-events: none;
+    }
+    #time-display {
+      font-size: 0.75rem;
+      color: #9980b3;
+      font-family: 'Courier New', monospace;
+      flex-shrink: 0;
+      min-width: 42px;
+      text-align: right;
+    }
+
+    #no-data-msg { color: #7a6490; font-size: 0.9rem; font-style: italic; }
+
+    /* ── Stars ── */
+    .stars { position: fixed; inset: 0; pointer-events: none; z-index: -1; overflow: hidden; }
+    .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--d,3s) ease-in-out infinite var(--delay,0s); opacity: 0; }
+    @keyframes twinkle { 0%,100%{opacity:0} 50%{opacity:var(--mo,0.4)} }
+
+    @media (max-width: 480px) {
+      #message-card { padding: 26px 20px; }
+      h1 { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<h1>For You ♡</h1>
+<p class="subtitle">a little something, every day</p>
+
+<div id="countdown-box">
+  <div id="countdown-label">next message unlocks in</div>
+  <div id="countdown-timer">--:--:--</div>
+</div>
+
+<div id="day-grid"></div>
+
+<div id="message-card">
+  <div id="message-day-label"></div>
+  <div id="message-topic"></div>
+
+  <!-- Photo -->
+  <div id="photo-wrap">
+    <img id="photo-img" src="" alt="" />
+    <div id="photo-caption"></div>
+  </div>
+
+  <!-- Regular text message -->
+  <div id="message-body"></div>
+
+  <!-- Poem -->
+  <div id="poem-wrap">
+    <div id="poem-title">a poem for you</div>
+    <div id="poem-body"></div>
+  </div>
+
+  <!-- Audio -->
+  <div id="audio-wrap">
+    <div id="audio-label">🎙 hear my voice</div>
+    <audio id="audio-el" preload="none"></audio>
+    <div class="audio-controls">
+      <button id="play-btn" aria-label="Play">&#9654;</button>
+      <div class="progress-wrap" id="progress-wrap">
+        <div id="progress-bar"></div>
+      </div>
+      <div id="time-display">0:00</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── CONFIG ──────────────────────────────────────────────────────────────
+  // Set this to the date you want to be Day 1. Format: 'YYYY-MM-DD'
+  const START_DATE = '2025-06-01';
+  // ────────────────────────────────────────────────────────────────────────
+
+  let data = {};
+
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 90; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2 + 1;
+    s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--mo:${0.2+Math.random()*0.5}`;
+    starsEl.appendChild(s);
+  }
+
+  function getDayNumber() {
+    const start = new Date(START_DATE + 'T00:00:00');
+    const now   = new Date();
+    const diff  = Math.floor((now - start) / 86400000);
+    return Math.min(Math.max(diff + 1, 0), 30);
+  }
+
+  function buildGrid(today) {
+    const grid = document.getElementById('day-grid');
+    grid.innerHTML = '';
+    for (let d = 1; d <= 30; d++) {
+      const btn = document.createElement('button');
+      btn.className = 'day-btn' + (d === today ? ' today' : '') + (d > today ? ' locked' : '');
+      btn.textContent = d;
+      btn.setAttribute('aria-label', d > today ? `Day ${d} – locked` : `Day ${d}`);
+      if (d <= today) btn.addEventListener('click', () => showMessage(d, btn));
+      grid.appendChild(btn);
+    }
+  }
+
+  function fmt(secs) {
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function showMessage(day, btn) {
+    document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const entry = data[day];
+    const card  = document.getElementById('message-card');
+
+    // Reset all sections
+    document.getElementById('photo-wrap').style.display    = 'none';
+    document.getElementById('message-body').style.display  = 'none';
+    document.getElementById('poem-wrap').style.display     = 'none';
+    document.getElementById('audio-wrap').style.display    = 'none';
+    document.getElementById('message-body').textContent    = '';
+    document.getElementById('poem-body').textContent       = '';
+
+    // Stop any playing audio
+    const audioEl = document.getElementById('audio-el');
+    audioEl.pause();
+    audioEl.src = '';
+    document.getElementById('play-btn').innerHTML = '&#9654;';
+    document.getElementById('progress-bar').style.width = '0%';
+    document.getElementById('time-display').textContent = '0:00';
+
+    document.getElementById('message-day-label').textContent = `Day ${day}`;
+
+    if (!entry) {
+      document.getElementById('message-topic').textContent = '';
+      document.getElementById('message-body').style.display = 'block';
+      document.getElementById('message-body').innerHTML =
+        '<span id="no-data-msg">This message is still being written with love… check back soon.</span>';
+      card.style.display = 'block';
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
+    }
+
+    document.getElementById('message-topic').textContent = entry.topic || '';
+
+    // Photo
+    if (entry.photo) {
+      const wrap = document.getElementById('photo-wrap');
+      document.getElementById('photo-img').src = entry.photo;
+      document.getElementById('photo-img').alt = entry.photo_caption || '';
+      document.getElementById('photo-caption').textContent = entry.photo_caption || '';
+      document.getElementById('photo-caption').style.display = entry.photo_caption ? 'block' : 'none';
+      wrap.style.display = 'block';
+    }
+
+    // Text message
+    if (entry.message) {
+      const body = document.getElementById('message-body');
+      body.textContent = entry.message;
+      body.style.display = 'block';
+    }
+
+    // Poem
+    if (entry.poem) {
+      document.getElementById('poem-body').textContent = entry.poem;
+      if (entry.poem_title) document.getElementById('poem-title').textContent = entry.poem_title;
+      else document.getElementById('poem-title').textContent = 'a poem for you';
+      document.getElementById('poem-wrap').style.display = 'block';
+    }
+
+    // Audio
+    if (entry.audio) {
+      audioEl.src = entry.audio;
+      audioEl.load();
+      document.getElementById('audio-wrap').style.display = 'block';
+
+      const playBtn = document.getElementById('play-btn');
+      const progressBar = document.getElementById('progress-bar');
+      const progressWrap = document.getElementById('progress-wrap');
+      const timeDisp = document.getElementById('time-display');
+
+      playBtn.onclick = () => {
+        if (audioEl.paused) { audioEl.play(); playBtn.innerHTML = '&#9646;&#9646;'; }
+        else { audioEl.pause(); playBtn.innerHTML = '&#9654;'; }
+      };
+
+      audioEl.ontimeupdate = () => {
+        if (!audioEl.duration) return;
+        const pct = (audioEl.currentTime / audioEl.duration) * 100;
+        progressBar.style.width = pct + '%';
+        timeDisp.textContent = fmt(audioEl.currentTime);
+      };
+
+      audioEl.onended = () => {
+        playBtn.innerHTML = '&#9654;';
+        progressBar.style.width = '0%';
+        audioEl.currentTime = 0;
+      };
+
+      progressWrap.onclick = (e) => {
+        const rect = progressWrap.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        audioEl.currentTime = ratio * audioEl.duration;
+      };
+    }
+
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function updateCountdown(today) {
+    const label   = document.getElementById('countdown-label');
+    const timerEl = document.getElementById('countdown-timer');
+
+    if (today >= 30) {
+      label.textContent = 'all 30 days are unlocked ♡';
+      timerEl.textContent = '';
+      return;
+    }
+
+    function tick() {
+      const start   = new Date(START_DATE + 'T00:00:00');
+      const nextDay = new Date(start);
+      nextDay.setDate(start.getDate() + today);
+      const diff = nextDay - new Date();
+      if (diff <= 0) { location.reload(); return; }
+      const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+      const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+      timerEl.textContent = `${h}:${m}:${s}`;
+    }
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  async function init() {
+    try {
+      const res = await fetch('messages.json');
+      const json = await res.json();
+      json.days.forEach(d => { data[d.day] = d; });
+    } catch(e) {
+      console.warn('Could not load messages.json');
+    }
+    const today = getDayNumber();
+    buildGrid(today);
+    updateCountdown(today);
+    const unlocked = document.querySelectorAll('.day-btn:not(.locked)');
+    if (unlocked.length) unlocked[unlocked.length - 1].click();
+  }
+
+  init();
+</script>
+</body>
+</html>
