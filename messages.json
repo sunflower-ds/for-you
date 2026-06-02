@@ -2,14 +2,16 @@
   "days": [
     {
       "day": 1,
-      "topic": "The Beginning",
+      "topic": "Origins",
       "message": "Your day 1 message here...",
-      "photo": "https://ibb.co/SXcD5848",
-      "photo_caption": "garlic"
+      "photo": "https://ibb.co/VWYV1dsk",
+      "photo_caption": "face"
     },
     {
         "day": 2,
         "topic": "Another day",
+        "poem_title": "Come",
+        "poem": "Roses are red, violets are blue, let me come on you",
         "audio": "https://res.cloudinary.com/drd77hzgt/video/upload/v1780430012/New_Recording_2_i2cbce.m4a"
     }
   ]
