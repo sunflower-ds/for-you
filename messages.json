@@ -6,6 +6,11 @@
       "message": "Your day 1 message here...",
       "photo": "https://ibb.co/SXcD5848",
       "photo_caption": "garlic"
+    },
+    {
+        "day": 2,
+        "topic": "Another day",
+        "audio": "https://res.cloudinary.com/drd77hzgt/video/upload/v1780430012/New_Recording_2_i2cbce.m4a"
     }
   ]
 }
