@@ -3,7 +3,9 @@
     {
       "day": 1,
       "topic": "The Beginning",
-      "message": "Your day 1 message here..."
+      "message": "Your day 1 message here...",
+      "photo": "https://ibb.co/SXcD5848",
+      "photo_caption": "garlic"
     }
   ]
 }
