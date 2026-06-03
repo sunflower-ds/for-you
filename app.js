@@ -31,10 +31,6 @@ function fmtDayOfMonth(d) {
   return d.getDate().toString();
 }
 
-function fmtFull(d) {
-  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-}
-
 // ── Draw vine ─────────────────────────────────────────────
 function drawVine(today) {
   const svg = document.getElementById('vine-svg');
@@ -90,8 +86,7 @@ function drawVine(today) {
     const { x, y } = positions[d - 1];
     const unlocked = d <= today;
     const isToday  = d === today;
-    const date     = getDayDate(d);
-    const dateNum  = fmtDayOfMonth(date);
+    const dateNum  = fmtDayOfMonth(getDayDate(d));
 
     const g = el('g', {
       style: unlocked ? 'cursor:pointer' : 'cursor:default',
@@ -108,13 +103,11 @@ function drawVine(today) {
       const pc = isToday ? '#f5c518' : '#c9a820';
       const cc = isToday ? '#5a2e00' : '#3d2008';
 
-      // Glow
       if (isToday) {
         el('circle', { r: '19', fill: 'rgba(245,197,24,0.11)' }, g);
         el('circle', { r: '14', fill: 'rgba(245,197,24,0.09)' }, g);
       }
 
-      // Petals
       for (let p = 0; p < 8; p++) {
         const a  = (p / 8) * Math.PI * 2;
         const px = Math.cos(a) * (pr * 1.55);
@@ -128,11 +121,9 @@ function drawVine(today) {
         }, g);
       }
 
-      // Center disc
       el('circle', { r: cr + 1.5, fill: cc }, g);
       el('circle', { r: cr, fill: isToday ? '#3d2008' : '#2a1505' }, g);
 
-      // Seed dots for today
       if (isToday) {
         [[-1.8,-1.8],[0,-2.3],[1.8,-1.8],[-2.3,0],[0,0],[2.3,0],[-1.8,1.8],[0,2.3],[1.8,1.8]].forEach(([sx,sy]) => {
           el('circle', { cx: sx, cy: sy, r: '0.85', fill: '#5a2e00' }, g);
@@ -150,7 +141,7 @@ function drawVine(today) {
         'font-weight': 'bold'
       }, g).textContent = d;
 
-      // Date (day of month number only) below flower
+      // Date number below flower
       el('text', {
         y: isToday ? pr + 18 : pr + 14,
         'text-anchor': 'middle',
@@ -162,8 +153,8 @@ function drawVine(today) {
 
     } else {
       // Bud
-      el('circle', { r: '5', fill: '#2a3a0a', opacity: '0.55' }, g);
-      el('circle', { r: '3', fill: '#1a2a08', opacity: '0.45' }, g);
+      el('circle', { r: '5',  fill: '#2a3a0a', opacity: '0.55' }, g);
+      el('circle', { r: '3',  fill: '#1a2a08', opacity: '0.45' }, g);
       for (let p = 0; p < 6; p++) {
         const a = (p / 6) * Math.PI * 2;
         el('ellipse', {
@@ -173,26 +164,13 @@ function drawVine(today) {
           fill: '#3a5010', opacity: '0.35'
         }, g);
       }
-
-      // Day number on bud
       el('text', {
-        y: '0.4',
-        'text-anchor': 'middle',
-        'dominant-baseline': 'middle',
-        'font-size': '4',
-        'font-family': 'sans-serif',
-        fill: '#4a5a20',
-        opacity: '0.5'
+        y: '0.4', 'text-anchor': 'middle', 'dominant-baseline': 'middle',
+        'font-size': '4', 'font-family': 'sans-serif', fill: '#4a5a20', opacity: '0.5'
       }, g).textContent = d;
-
-      // Date number below bud — faint
       el('text', {
-        y: '16',
-        'text-anchor': 'middle',
-        'font-size': '7',
-        'font-family': 'sans-serif',
-        fill: '#3a4a18',
-        opacity: '0.4'
+        y: '16', 'text-anchor': 'middle',
+        'font-size': '7', 'font-family': 'sans-serif', fill: '#3a4a18', opacity: '0.4'
       }, g).textContent = dateNum;
     }
   }
@@ -308,11 +286,13 @@ function resetCard() {
   document.getElementById('message-body').style.display   = 'none';
   document.getElementById('poem-wrap').style.display      = 'none';
   document.getElementById('questions-wrap').style.display = 'none';
+  document.getElementById('signature').style.display      = 'none';
   document.getElementById('badges').innerHTML              = '';
   document.getElementById('message-body').textContent     = '';
   document.getElementById('poem-body').textContent        = '';
   document.getElementById('photo-caption').textContent    = '';
   document.getElementById('questions-list').innerHTML     = '';
+  document.getElementById('signature').textContent        = '';
   const audio = document.getElementById('audio-el');
   audio.pause();
   audio.src = '';
@@ -417,11 +397,15 @@ function renderQuestions(entry) {
   };
 }
 
+function renderSignature(entry) {
+  const el = document.getElementById('signature');
+  if (!entry.signature) { el.style.display = 'none'; return; }
+  el.textContent   = '— ' + entry.signature;
+  el.style.display = 'block';
+}
+
 // ── Show message ──────────────────────────────────────────
 function showMessage(day) {
-  // Highlight active flower
-  document.querySelectorAll('.vine-flower-active').forEach(el => el.classList.remove('vine-flower-active'));
-
   resetCard();
   const entry = data[day];
   const card  = document.getElementById('card');
@@ -445,6 +429,7 @@ function showMessage(day) {
   renderMessage(entry);
   renderPoem(entry);
   renderQuestions(entry);
+  renderSignature(entry);
   card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   revealCardChildren();
 }
