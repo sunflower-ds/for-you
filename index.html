@@ -11,9 +11,9 @@
 
   <div class="stars" id="stars"></div>
 
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!--  WELCOME SCREEN                                     -->
-  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════ -->
+  <!--  WELCOME SCREEN                            -->
+  <!-- ══════════════════════════════════════════ -->
   <div id="welcome-screen">
 
     <svg class="sunflower-icon welcome-sunflower" width="72" height="72" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -42,16 +42,13 @@
 
     <div class="welcome-box">
       <p class="welcome-from">from me, to you</p>
-      <h1 class="welcome-title" id="welcome-title">For You 🌻</h1>
-
-      <!-- You can edit the text below directly in this file -->
-      <p class="welcome-body" id="welcome-message">
+      <h1 class="welcome-title">For You 🌻</h1>
+      <p class="welcome-body">
         Every single day for 30 days, I've written something just for you.<br><br>
         A thought, a memory, a feeling — something I want you to know.<br><br>
         Open today's message, and come back tomorrow for the next one.<br><br>
         This is all for you. Because you deserve to feel loved, every day.
       </p>
-
       <button class="enter-btn" id="enter-btn">
         open today's message &nbsp;🌻
       </button>
@@ -59,12 +56,11 @@
 
   </div>
 
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!--  MAIN SCREEN                                        -->
-  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════ -->
+  <!--  MAIN SCREEN                               -->
+  <!-- ══════════════════════════════════════════ -->
   <div id="main-screen" class="hidden">
 
-    <!-- Top bar -->
     <div class="top-bar reveal">
       <button class="welcome-return-btn" id="welcome-return-btn" aria-label="Back to welcome">
         <svg width="28" height="28" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -83,7 +79,7 @@
         </svg>
       </button>
       <span class="top-bar-title">For You 🌻</span>
-      <div style="width:36px"></div><!-- spacer to center the title -->
+      <div style="width:36px"></div>
     </div>
 
     <p class="subtitle reveal">a little something, every day</p>
@@ -93,12 +89,23 @@
       <div class="countdown-timer" id="countdown-timer">--:--:--</div>
     </div>
 
-    <div class="day-grid reveal" id="day-grid"></div>
+    <!-- ── Vine ── -->
+    <div class="vine-container reveal">
+      <div class="vine-scroll">
+        <svg id="vine-svg"
+             viewBox="0 0 620 280"
+             xmlns="http://www.w3.org/2000/svg"
+             width="620" height="280"
+             aria-label="30-day progress vine">
+        </svg>
+      </div>
+    </div>
 
+    <!-- ── Message card ── -->
     <div class="card" id="card">
       <div class="day-label  reveal-child" id="day-label"></div>
       <div class="topic      reveal-child" id="topic"></div>
-      <div class="            reveal-child" id="badges"></div>
+      <div class="           reveal-child" id="badges"></div>
 
       <div class="photo-wrap reveal-child" id="photo-wrap">
         <img id="photo-img" src="" alt="" />

@@ -4,17 +4,209 @@ const START_DATE = '2026-06-01';
 
 let data = {};
 
+const VINE_COLS  = 10;
+const VINE_ROWS  = 3;
+const VINE_TOTAL = 30;
+
+// ── Vine positions ────────────────────────────────────────
+function getVinePositions() {
+  const pos = [];
+  for (let row = 0; row < VINE_ROWS; row++) {
+    const ltr = row % 2 === 0;
+    for (let col = 0; col < VINE_COLS; col++) {
+      const c = ltr ? col : (VINE_COLS - 1 - col);
+      pos.push({ x: 31 + c * 56, y: 44 + row * 88, row });
+    }
+  }
+  return pos;
+}
+
+function getDayDate(dayNum) {
+  const d = new Date(START_DATE + 'T00:00:00');
+  d.setDate(d.getDate() + dayNum - 1);
+  return d;
+}
+
+function fmtDayOfMonth(d) {
+  return d.getDate().toString();
+}
+
+function fmtFull(d) {
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+// ── Draw vine ─────────────────────────────────────────────
+function drawVine(today) {
+  const svg = document.getElementById('vine-svg');
+  if (!svg) return;
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+  const positions = getVinePositions();
+
+  function el(tag, attrs, parent) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    (parent || svg).appendChild(e);
+    return e;
+  }
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  // Vine segments
+  for (let i = 0; i < positions.length - 1; i++) {
+    const unlocked = i < today;
+    const { x: x1, y: y1, row: r1 } = positions[i];
+    const { x: x2, y: y2, row: r2 } = positions[i + 1];
+    const mx = (x1 + x2) / 2;
+    let d;
+    if (r1 === r2) {
+      d = `M ${x1} ${y1} C ${mx} ${y1 - 10}, ${mx} ${y2 - 10}, ${x2} ${y2}`;
+    } else {
+      d = `M ${x1} ${y1} C ${x1} ${(y1+y2)/2}, ${x2} ${(y1+y2)/2}, ${x2} ${y2}`;
+    }
+    el('path', {
+      d,
+      stroke: unlocked ? '#4a6a1a' : '#2a3a0a',
+      'stroke-width': unlocked ? '2.5' : '1.8',
+      fill: 'none',
+      'stroke-linecap': 'round',
+      opacity: unlocked ? '1' : '0.35'
+    });
+
+    if (unlocked && i % 2 === 0 && r1 === r2) {
+      const lx = lerp(x1, x2, 0.45);
+      const ly = lerp(y1, y2, 0.45) - 9;
+      const ld = i % 4 === 0 ? -1 : 1;
+      el('ellipse', {
+        cx: lx, cy: ly, rx: '6', ry: '3.5',
+        transform: `rotate(${ld * 35} ${lx} ${ly})`,
+        fill: '#3d6614', opacity: '0.8'
+      });
+    }
+  }
+
+  // Flowers
+  for (let d = 1; d <= VINE_TOTAL; d++) {
+    const { x, y } = positions[d - 1];
+    const unlocked = d <= today;
+    const isToday  = d === today;
+    const date     = getDayDate(d);
+    const dateNum  = fmtDayOfMonth(date);
+
+    const g = el('g', {
+      style: unlocked ? 'cursor:pointer' : 'cursor:default',
+      transform: `translate(${x},${y})`
+    });
+
+    if (unlocked) {
+      g.addEventListener('click', () => showMessage(d));
+    }
+
+    if (unlocked) {
+      const pr = isToday ? 12 : 9;
+      const cr = isToday ? 6.5 : 5;
+      const pc = isToday ? '#f5c518' : '#c9a820';
+      const cc = isToday ? '#5a2e00' : '#3d2008';
+
+      // Glow
+      if (isToday) {
+        el('circle', { r: '19', fill: 'rgba(245,197,24,0.11)' }, g);
+        el('circle', { r: '14', fill: 'rgba(245,197,24,0.09)' }, g);
+      }
+
+      // Petals
+      for (let p = 0; p < 8; p++) {
+        const a  = (p / 8) * Math.PI * 2;
+        const px = Math.cos(a) * (pr * 1.55);
+        const py = Math.sin(a) * (pr * 1.55);
+        el('ellipse', {
+          cx: px, cy: py,
+          rx: isToday ? '5' : '3.8',
+          ry: isToday ? '8.5' : '6.5',
+          transform: `rotate(${(p/8)*360} ${px} ${py})`,
+          fill: pc, opacity: '0.9'
+        }, g);
+      }
+
+      // Center disc
+      el('circle', { r: cr + 1.5, fill: cc }, g);
+      el('circle', { r: cr, fill: isToday ? '#3d2008' : '#2a1505' }, g);
+
+      // Seed dots for today
+      if (isToday) {
+        [[-1.8,-1.8],[0,-2.3],[1.8,-1.8],[-2.3,0],[0,0],[2.3,0],[-1.8,1.8],[0,2.3],[1.8,1.8]].forEach(([sx,sy]) => {
+          el('circle', { cx: sx, cy: sy, r: '0.85', fill: '#5a2e00' }, g);
+        });
+      }
+
+      // Day number inside center
+      el('text', {
+        y: '0.4',
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'font-size': isToday ? '5.5' : '4.8',
+        'font-family': 'sans-serif',
+        fill: isToday ? '#f5e090' : '#c9a040',
+        'font-weight': 'bold'
+      }, g).textContent = d;
+
+      // Date (day of month number only) below flower
+      el('text', {
+        y: isToday ? pr + 18 : pr + 14,
+        'text-anchor': 'middle',
+        'font-size': isToday ? '8.5' : '7.5',
+        'font-family': 'sans-serif',
+        fill: isToday ? '#f5c518' : '#7a6820',
+        'font-weight': isToday ? 'bold' : 'normal'
+      }, g).textContent = dateNum;
+
+    } else {
+      // Bud
+      el('circle', { r: '5', fill: '#2a3a0a', opacity: '0.55' }, g);
+      el('circle', { r: '3', fill: '#1a2a08', opacity: '0.45' }, g);
+      for (let p = 0; p < 6; p++) {
+        const a = (p / 6) * Math.PI * 2;
+        el('ellipse', {
+          cx: Math.cos(a)*4.5, cy: Math.sin(a)*4.5,
+          rx: '1.8', ry: '3.2',
+          transform: `rotate(${(p/6)*360} ${Math.cos(a)*4.5} ${Math.sin(a)*4.5})`,
+          fill: '#3a5010', opacity: '0.35'
+        }, g);
+      }
+
+      // Day number on bud
+      el('text', {
+        y: '0.4',
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'font-size': '4',
+        'font-family': 'sans-serif',
+        fill: '#4a5a20',
+        opacity: '0.5'
+      }, g).textContent = d;
+
+      // Date number below bud — faint
+      el('text', {
+        y: '16',
+        'text-anchor': 'middle',
+        'font-size': '7',
+        'font-family': 'sans-serif',
+        fill: '#3a4a18',
+        opacity: '0.4'
+      }, g).textContent = dateNum;
+    }
+  }
+}
+
 // ── Screen switching ──────────────────────────────────────
 function showMain() {
   const welcome = document.getElementById('welcome-screen');
   const main    = document.getElementById('main-screen');
-
   welcome.classList.add('exiting');
   setTimeout(() => {
     welcome.style.display = 'none';
     main.classList.remove('hidden');
     main.classList.add('entering');
-    // Trigger reveals now that main is visible
     triggerVisibleReveals();
   }, 680);
 }
@@ -22,15 +214,12 @@ function showMain() {
 function showWelcome() {
   const welcome = document.getElementById('welcome-screen');
   const main    = document.getElementById('main-screen');
-
   main.classList.add('hidden');
   main.classList.remove('entering');
   welcome.style.display = 'flex';
   welcome.classList.remove('exiting');
   welcome.style.animation = 'none';
-  requestAnimationFrame(() => {
-    welcome.style.animation = '';
-  });
+  requestAnimationFrame(() => { welcome.style.animation = ''; });
 }
 
 // ── Floating petal particles ──────────────────────────────
@@ -41,15 +230,11 @@ function buildPetals() {
     p.className = 'petal';
     const size = Math.random() * 5 + 4;
     p.style.cssText = [
-      `width: ${size}px`,
-      `height: ${size * 1.6}px`,
-      `left: ${Math.random() * 100}%`,
-      `top: ${40 + Math.random() * 60}%`,
-      `--pd: ${3 + Math.random() * 5}s`,
-      `--pdelay: ${Math.random() * 6}s`,
-      `transform: rotate(${Math.random() * 360}deg)`,
-      `opacity: 0`
-    ].join('; ');
+      `width:${size}px`, `height:${size*1.6}px`,
+      `left:${Math.random()*100}%`, `top:${40+Math.random()*60}%`,
+      `--pd:${3+Math.random()*5}s`, `--pdelay:${Math.random()*6}s`,
+      `transform:rotate(${Math.random()*360}deg)`, `opacity:0`
+    ].join(';');
     container.appendChild(p);
   }
   for (let i = 0; i < 55; i++) {
@@ -57,14 +242,11 @@ function buildPetals() {
     s.className = 'star';
     const sz = Math.random() * 2 + 1;
     s.style.cssText = [
-      `width: ${sz}px`,
-      `height: ${sz}px`,
-      `left: ${Math.random() * 100}%`,
-      `top: ${Math.random() * 100}%`,
-      `--d: ${2 + Math.random() * 5}s`,
-      `--delay: ${Math.random() * 6}s`,
-      `--mo: ${0.15 + Math.random() * 0.4}`
-    ].join('; ');
+      `width:${sz}px`, `height:${sz}px`,
+      `left:${Math.random()*100}%`, `top:${Math.random()*100}%`,
+      `--d:${2+Math.random()*5}s`, `--delay:${Math.random()*6}s`,
+      `--mo:${0.15+Math.random()*0.4}`
+    ].join(';');
     container.appendChild(s);
   }
 }
@@ -75,11 +257,7 @@ let revealObserver = null;
 function initScrollReveal() {
   if (revealObserver) revealObserver.disconnect();
   revealObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
-      });
-    },
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
     { threshold: 0.1 }
   );
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
@@ -89,15 +267,13 @@ function triggerVisibleReveals() {
   initScrollReveal();
   setTimeout(() => {
     document.querySelectorAll('.reveal').forEach(el => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight) el.classList.add('visible');
+      if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible');
     });
   }, 80);
 }
 
 function revealCardChildren() {
-  const children = document.querySelectorAll('.reveal-child');
-  children.forEach((el, i) => {
+  document.querySelectorAll('.reveal-child').forEach((el, i) => {
     el.style.transitionDelay = `${i * 110}ms`;
     setTimeout(() => el.classList.add('visible'), 60 + i * 110);
   });
@@ -122,29 +298,6 @@ function formatTime(seconds) {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60).toString().padStart(2, '0');
   return `${m}:${s}`;
-}
-
-// ── Day grid ──────────────────────────────────────────────
-function buildGrid(today) {
-  const grid = document.getElementById('day-grid');
-  grid.innerHTML = '';
-  for (let d = 1; d <= 30; d++) {
-    const btn = document.createElement('button');
-    // today gets its own class; active will be set on click
-    btn.className = 'day-btn'
-      + (d === today ? ' today'  : '')
-      + (d > today   ? ' locked' : '');
-    btn.textContent = d;
-    btn.setAttribute('aria-label', d > today ? `Day ${d} — locked` : `Day ${d}`);
-    if (d <= today) btn.addEventListener('click', () => showMessage(d));
-    grid.appendChild(btn);
-  }
-}
-
-function setActiveButton(day) {
-  document.querySelectorAll('.day-btn').forEach(btn => {
-    btn.classList.toggle('active', parseInt(btn.textContent) === day);
-  });
 }
 
 // ── Card reset ────────────────────────────────────────────
@@ -212,7 +365,7 @@ function renderAudio(entry) {
     audioEl.currentTime = 0;
     setTimeout(() => { timeDisplay.textContent = '0:00'; }, 300);
   };
-  progressWrap.onclick = (e) => {
+  progressWrap.onclick = e => {
     const r = progressWrap.getBoundingClientRect();
     audioEl.currentTime = ((e.clientX - r.left) / r.width) * audioEl.duration;
   };
@@ -240,11 +393,7 @@ function renderQuestions(entry) {
   const btnText   = document.getElementById('reveal-btn-text');
   const questions = entry.questions.slice(0, 3);
   let revealed    = 0;
-  const labels    = [
-    '&#10022; reveal a question',
-    '&#10022; reveal another',
-    '&#10022; one more'
-  ];
+  const labels    = ['&#10022; reveal a question', '&#10022; reveal another', '&#10022; one more'];
   wrap.style.display  = 'block';
   revealBtn.className = 'reveal-btn';
   btnText.innerHTML   = labels[0];
@@ -270,12 +419,15 @@ function renderQuestions(entry) {
 
 // ── Show message ──────────────────────────────────────────
 function showMessage(day) {
-  setActiveButton(day);
+  // Highlight active flower
+  document.querySelectorAll('.vine-flower-active').forEach(el => el.classList.remove('vine-flower-active'));
+
   resetCard();
   const entry = data[day];
   const card  = document.getElementById('card');
   document.getElementById('day-label').textContent = `Day ${day}`;
   card.style.display = 'block';
+
   if (!entry) {
     document.getElementById('topic').textContent = '';
     const body = document.getElementById('message-body');
@@ -285,6 +437,7 @@ function showMessage(day) {
     revealCardChildren();
     return;
   }
+
   document.getElementById('topic').textContent = entry.topic || '';
   renderBadges(entry);
   renderPhoto(entry);
@@ -324,7 +477,6 @@ function startCountdown(today) {
 async function init() {
   buildPetals();
 
-  // Button listeners
   document.getElementById('enter-btn').addEventListener('click', showMain);
   document.getElementById('welcome-return-btn').addEventListener('click', showWelcome);
 
@@ -337,13 +489,9 @@ async function init() {
   }
 
   const today = getDayNumber();
-  buildGrid(today);
+  drawVine(today);
   startCountdown(today);
-
-  // Pre-select today so it's ready when she enters
-  // (card won't show until main screen is visible)
-  const todayBtn = document.querySelector('.day-btn.today');
-  if (todayBtn) todayBtn.click();
+  showMessage(today);
 }
 
 init();
