@@ -43,7 +43,6 @@ function formatTime(seconds) {
 function buildGrid(today) {
   const grid = document.getElementById('day-grid');
   grid.innerHTML = '';
-
   for (let d = 1; d <= 30; d++) {
     const btn = document.createElement('button');
     btn.className = 'day-btn'
@@ -51,10 +50,7 @@ function buildGrid(today) {
       + (d > today   ? ' locked' : '');
     btn.textContent = d;
     btn.setAttribute('aria-label', d > today ? `Day ${d} — locked` : `Day ${d}`);
-
-    if (d <= today) {
-      btn.addEventListener('click', () => showMessage(d));
-    }
+    if (d <= today) btn.addEventListener('click', () => showMessage(d));
     grid.appendChild(btn);
   }
 }
@@ -65,30 +61,33 @@ function setActiveButton(day) {
   });
 }
 
-// ── Message card ──────────────────────────────────────────
+// ── Card reset ────────────────────────────────────────────
 function resetCard() {
-  document.getElementById('photo-wrap').style.display   = 'none';
-  document.getElementById('message-body').style.display = 'none';
-  document.getElementById('poem-wrap').style.display    = 'none';
-  document.getElementById('audio-wrap').style.display   = 'none';
-  document.getElementById('badges').innerHTML            = '';
-  document.getElementById('message-body').textContent   = '';
-  document.getElementById('poem-body').textContent      = '';
-  document.getElementById('photo-caption').textContent  = '';
+  document.getElementById('photo-wrap').style.display    = 'none';
+  document.getElementById('audio-wrap').style.display    = 'none';
+  document.getElementById('message-body').style.display  = 'none';
+  document.getElementById('poem-wrap').style.display     = 'none';
+  document.getElementById('questions-wrap').style.display = 'none';
+  document.getElementById('badges').innerHTML             = '';
+  document.getElementById('message-body').textContent    = '';
+  document.getElementById('poem-body').textContent       = '';
+  document.getElementById('photo-caption').textContent   = '';
+  document.getElementById('questions-list').innerHTML    = '';
 
   const audio = document.getElementById('audio-el');
   audio.pause();
   audio.src = '';
-  document.getElementById('play-btn').innerHTML        = '&#9654;';
-  document.getElementById('progress-bar').style.width = '0%';
-  document.getElementById('time-display').textContent  = '0:00';
+  document.getElementById('play-btn').innerHTML         = '&#9654;';
+  document.getElementById('progress-bar').style.width  = '0%';
+  document.getElementById('time-display').textContent   = '0:00';
 }
 
+// ── Render sections ───────────────────────────────────────
 function renderBadges(entry) {
   const container = document.getElementById('badges');
   if (entry.photo) container.innerHTML += `<span class="badge badge-photo">&#128247; photo</span>`;
-  if (entry.poem)  container.innerHTML += `<span class="badge badge-poem">&#10022; poem</span>`;
   if (entry.audio) container.innerHTML += `<span class="badge badge-audio">&#127908; voice</span>`;
+  if (entry.poem)  container.innerHTML += `<span class="badge badge-poem">&#10022; poem</span>`;
 }
 
 function renderPhoto(entry) {
@@ -97,31 +96,17 @@ function renderPhoto(entry) {
   document.getElementById('photo-img').src = entry.photo;
   document.getElementById('photo-img').alt = entry.photo_caption || '';
   const caption = document.getElementById('photo-caption');
-  caption.textContent    = entry.photo_caption || '';
-  caption.style.display  = entry.photo_caption ? 'block' : 'none';
-  wrap.style.display     = 'block';
-}
-
-function renderMessage(entry) {
-  if (!entry.message) return;
-  const body = document.getElementById('message-body');
-  body.textContent   = entry.message;
-  body.style.display = 'block';
-}
-
-function renderPoem(entry) {
-  if (!entry.poem) return;
-  document.getElementById('poem-title').textContent = entry.poem_title || 'a poem for you';
-  document.getElementById('poem-body').textContent  = entry.poem;
-  document.getElementById('poem-wrap').style.display = 'block';
+  caption.textContent   = entry.photo_caption || '';
+  caption.style.display = entry.photo_caption ? 'block' : 'none';
+  wrap.style.display    = 'block';
 }
 
 function renderAudio(entry) {
   if (!entry.audio) return;
 
-  const audioEl     = document.getElementById('audio-el');
-  const playBtn     = document.getElementById('play-btn');
-  const progressBar = document.getElementById('progress-bar');
+  const audioEl      = document.getElementById('audio-el');
+  const playBtn      = document.getElementById('play-btn');
+  const progressBar  = document.getElementById('progress-bar');
   const progressWrap = document.getElementById('progress-wrap');
   const timeDisplay  = document.getElementById('time-display');
 
@@ -142,8 +127,8 @@ function renderAudio(entry) {
   audioEl.ontimeupdate = () => {
     if (!audioEl.duration) return;
     const pct = (audioEl.currentTime / audioEl.duration) * 100;
-    progressBar.style.width  = pct + '%';
-    timeDisplay.textContent  = formatTime(audioEl.currentTime);
+    progressBar.style.width = pct + '%';
+    timeDisplay.textContent = formatTime(audioEl.currentTime);
   };
 
   audioEl.onended = () => {
@@ -160,6 +145,78 @@ function renderAudio(entry) {
   };
 }
 
+function renderMessage(entry) {
+  if (!entry.message) return;
+  const body = document.getElementById('message-body');
+  body.textContent   = entry.message;
+  body.style.display = 'block';
+}
+
+function renderPoem(entry) {
+  if (!entry.poem) return;
+  document.getElementById('poem-title').textContent   = entry.poem_title || 'a poem for you';
+  document.getElementById('poem-body').textContent    = entry.poem;
+  document.getElementById('poem-wrap').style.display  = 'block';
+}
+
+function renderQuestions(entry) {
+  if (!entry.questions || entry.questions.length === 0) return;
+
+  const wrap      = document.getElementById('questions-wrap');
+  const list      = document.getElementById('questions-list');
+  const revealBtn = document.getElementById('reveal-btn');
+  const btnText   = document.getElementById('reveal-btn-text');
+
+  const questions = entry.questions.slice(0, 3);
+  let revealed    = 0;
+
+  wrap.style.display = 'block';
+
+  // Labels for the button at each stage
+  const labels = [
+    '&#10022; reveal a question',
+    '&#10022; reveal another',
+    '&#10022; one more'
+  ];
+
+  revealBtn.className  = 'reveal-btn';
+  btnText.innerHTML    = labels[0];
+
+  revealBtn.onclick = () => {
+    if (revealed >= questions.length) return;
+
+    const item = document.createElement('div');
+    item.className = 'question-item';
+
+    const num  = document.createElement('div');
+    num.className   = 'question-number';
+    num.textContent = `0${revealed + 1}`;
+
+    const text  = document.createElement('div');
+    text.className   = 'question-text';
+    text.textContent = questions[revealed];
+
+    item.appendChild(num);
+    item.appendChild(text);
+    list.appendChild(item);
+
+    revealed++;
+
+    // Scroll the new question into view gently
+    setTimeout(() => {
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+
+    // Update button or hide it
+    if (revealed >= questions.length) {
+      revealBtn.classList.add('all-done');
+    } else {
+      btnText.innerHTML = labels[revealed];
+    }
+  };
+}
+
+// ── Show message ──────────────────────────────────────────
 function showMessage(day) {
   setActiveButton(day);
   resetCard();
@@ -180,11 +237,14 @@ function showMessage(day) {
   }
 
   document.getElementById('topic').textContent = entry.topic || '';
+
+  // Render in order: badges → photo → audio → message → poem → questions
   renderBadges(entry);
   renderPhoto(entry);
+  renderAudio(entry);
   renderMessage(entry);
   renderPoem(entry);
-  renderAudio(entry);
+  renderQuestions(entry);
 
   card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -195,8 +255,8 @@ function startCountdown(today) {
   const labelEl = document.querySelector('.countdown-label');
 
   if (today >= 30) {
-    labelEl.textContent  = 'all 30 days are unlocked ♡';
-    timerEl.textContent  = '';
+    labelEl.textContent = 'all 30 days are unlocked ♡';
+    timerEl.textContent = '';
     return;
   }
 
@@ -204,13 +264,11 @@ function startCountdown(today) {
     const start   = new Date(START_DATE + 'T00:00:00');
     const nextDay = new Date(start);
     nextDay.setDate(start.getDate() + today);
-
     const diff = nextDay - new Date();
     if (diff <= 0) { location.reload(); return; }
-
     const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
     const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-    const s = String(Math.floor((diff % 60000)   / 1000)).padStart(2, '0');
+    const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
     timerEl.textContent = `${h}:${m}:${s}`;
   }
 
@@ -236,8 +294,7 @@ async function init() {
 
   const unlocked = document.querySelectorAll('.day-btn:not(.locked)');
   if (unlocked.length) {
-    const last = unlocked[unlocked.length - 1];
-    showMessage(parseInt(last.textContent));
+    showMessage(parseInt(unlocked[unlocked.length - 1].textContent));
   }
 }
 

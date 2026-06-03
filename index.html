@@ -11,7 +11,7 @@
   <div class="stars" id="stars"></div>
 
   <h1>For You ♡</h1>
-  <p class="subtitle">a little something, every day, for my love</p>
+  <p class="subtitle">a little something, every day</p>
 
   <div class="countdown-box">
     <div class="countdown-label">next message unlocks in</div>
@@ -21,22 +21,17 @@
   <div class="day-grid" id="day-grid"></div>
 
   <div class="card" id="card">
-    <div class="day-label"  id="day-label"></div>
-    <div class="topic"      id="topic"></div>
-    <div                    id="badges"></div>
+    <div class="day-label" id="day-label"></div>
+    <div class="topic"     id="topic"></div>
+    <div                   id="badges"></div>
 
+    <!-- 1. Photo -->
     <div class="photo-wrap" id="photo-wrap">
       <img id="photo-img" src="" alt="" />
       <div class="photo-caption" id="photo-caption"></div>
     </div>
 
-    <div class="message-body" id="message-body"></div>
-
-    <div class="poem-wrap" id="poem-wrap">
-      <div class="poem-title" id="poem-title">a poem for you</div>
-      <div class="poem-body"  id="poem-body"></div>
-    </div>
-
+    <!-- 2. Audio (moved above message) -->
     <div class="audio-wrap" id="audio-wrap">
       <div class="audio-label">&#127908; hear my voice</div>
       <audio id="audio-el" preload="none"></audio>
@@ -47,6 +42,25 @@
         </div>
         <div class="time-display" id="time-display">0:00</div>
       </div>
+    </div>
+
+    <!-- 3. Message text -->
+    <div class="message-body" id="message-body"></div>
+
+    <!-- 4. Poem -->
+    <div class="poem-wrap" id="poem-wrap">
+      <div class="poem-title" id="poem-title">a poem for you</div>
+      <div class="poem-body"  id="poem-body"></div>
+    </div>
+
+    <!-- 5. Questions -->
+    <div class="questions-wrap" id="questions-wrap">
+      <div class="questions-divider"></div>
+      <div class="questions-header">things to think about</div>
+      <div class="questions-list" id="questions-list"></div>
+      <button class="reveal-btn" id="reveal-btn" aria-label="Reveal next question">
+        <span id="reveal-btn-text">&#10022; reveal a question</span>
+      </button>
     </div>
   </div>
 
