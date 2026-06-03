@@ -3,36 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>For You ♡</title>
+  <title>For You 🌻</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Sunflower SVG favicon (inline data URI) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='12' fill='%23704214'/%3E%3Cg fill='%23f5c518'%3E%3Cellipse cx='32' cy='10' rx='5' ry='10' rx='5'/%3E%3Cellipse cx='32' cy='54' rx='5' ry='10'/%3E%3Cellipse cx='10' cy='32' rx='10' ry='5'/%3E%3Cellipse cx='54' cy='32' rx='10' ry='5'/%3E%3Cellipse cx='17' cy='17' rx='5' ry='10' transform='rotate(-45 17 17)'/%3E%3Cellipse cx='47' cy='47' rx='5' ry='10' transform='rotate(-45 47 47)'/%3E%3Cellipse cx='47' cy='17' rx='5' ry='10' transform='rotate(45 47 17)'/%3E%3Cellipse cx='17' cy='47' rx='5' ry='10' transform='rotate(45 17 47)'/%3E%3C/g%3E%3C/svg%3E" />
 </head>
 <body>
 
   <div class="stars" id="stars"></div>
 
-  <h1>For You ♡</h1>
-  <p class="subtitle">a little something, every day</p>
+  <!-- Spinning sunflower header icon -->
+  <svg class="sunflower-icon reveal" width="52" height="52" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g fill="#f5c518">
+      <ellipse cx="32" cy="9"  rx="5.5" ry="11"/>
+      <ellipse cx="32" cy="55" rx="5.5" ry="11"/>
+      <ellipse cx="9"  cy="32" rx="11"  ry="5.5"/>
+      <ellipse cx="55" cy="32" rx="11"  ry="5.5"/>
+      <ellipse cx="16" cy="16" rx="5.5" ry="11" transform="rotate(-45 16 16)"/>
+      <ellipse cx="48" cy="48" rx="5.5" ry="11" transform="rotate(-45 48 48)"/>
+      <ellipse cx="48" cy="16" rx="5.5" ry="11" transform="rotate(45 48 16)"/>
+      <ellipse cx="16" cy="48" rx="5.5" ry="11" transform="rotate(45 16 48)"/>
+    </g>
+    <circle cx="32" cy="32" r="13" fill="#704214"/>
+    <circle cx="32" cy="32" r="9"  fill="#3d2008"/>
+    <!-- seed dots -->
+    <circle cx="29" cy="29" r="1.2" fill="#704214"/>
+    <circle cx="32" cy="28" r="1.2" fill="#704214"/>
+    <circle cx="35" cy="29" r="1.2" fill="#704214"/>
+    <circle cx="28" cy="32" r="1.2" fill="#704214"/>
+    <circle cx="32" cy="32" r="1.2" fill="#704214"/>
+    <circle cx="36" cy="32" r="1.2" fill="#704214"/>
+    <circle cx="29" cy="35" r="1.2" fill="#704214"/>
+    <circle cx="32" cy="36" r="1.2" fill="#704214"/>
+    <circle cx="35" cy="35" r="1.2" fill="#704214"/>
+  </svg>
 
-  <div class="countdown-box">
+  <h1 class="reveal">For You 🌻</h1>
+  <p class="subtitle reveal">a little something, every day</p>
+
+  <div class="countdown-box reveal">
     <div class="countdown-label">next message unlocks in</div>
     <div class="countdown-timer" id="countdown-timer">--:--:--</div>
   </div>
 
-  <div class="day-grid" id="day-grid"></div>
+  <div class="day-grid reveal" id="day-grid"></div>
 
   <div class="card" id="card">
-    <div class="day-label" id="day-label"></div>
-    <div class="topic"     id="topic"></div>
-    <div                   id="badges"></div>
+
+    <!-- Each section gets reveal-child class; JS assigns delay via style -->
+    <div class="day-label reveal-child"  id="day-label"></div>
+    <div class="topic   reveal-child"    id="topic"></div>
+    <div class="reveal-child"            id="badges"></div>
 
     <!-- 1. Photo -->
-    <div class="photo-wrap" id="photo-wrap">
+    <div class="photo-wrap reveal-child" id="photo-wrap">
       <img id="photo-img" src="" alt="" />
       <div class="photo-caption" id="photo-caption"></div>
     </div>
 
-    <!-- 2. Audio (moved above message) -->
-    <div class="audio-wrap" id="audio-wrap">
+    <!-- 2. Audio -->
+    <div class="audio-wrap reveal-child" id="audio-wrap">
       <div class="audio-label">&#127908; hear my voice</div>
       <audio id="audio-el" preload="none"></audio>
       <div class="audio-controls">
@@ -45,16 +76,16 @@
     </div>
 
     <!-- 3. Message text -->
-    <div class="message-body" id="message-body"></div>
+    <div class="message-body reveal-child" id="message-body"></div>
 
     <!-- 4. Poem -->
-    <div class="poem-wrap" id="poem-wrap">
+    <div class="poem-wrap reveal-child" id="poem-wrap">
       <div class="poem-title" id="poem-title">a poem for you</div>
       <div class="poem-body"  id="poem-body"></div>
     </div>
 
     <!-- 5. Questions -->
-    <div class="questions-wrap" id="questions-wrap">
+    <div class="questions-wrap reveal-child" id="questions-wrap">
       <div class="questions-divider"></div>
       <div class="questions-header">things to think about</div>
       <div class="questions-list" id="questions-list"></div>
@@ -62,6 +93,7 @@
         <span id="reveal-btn-text">&#10022; reveal a question</span>
       </button>
     </div>
+
   </div>
 
   <script src="app.js"></script>
