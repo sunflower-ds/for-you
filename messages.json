@@ -38,6 +38,17 @@
         "What are your date availabilities for sky diving? I'm booking it for us"
       ],
       "signature": "Your adventure buddy, Suraj"
+    },
+    {
+        "day": 4,
+        "topic": "Joy",
+        "message": "I love your smile and how you make me smile.",
+        "questions": [
+        "What is your most fun memory with me?",
+        "How high do you value joy in your relationship qualities?",
+        "Is it a major concern of yours that you will get laugh lines if you date me?"
+      ],
+      "signature": "Keep smiling, Suraj"
     }
   ]
 }
