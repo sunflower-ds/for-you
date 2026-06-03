@@ -5,93 +5,133 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>For You 🌻</title>
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Sunflower SVG favicon (inline data URI) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='12' fill='%23704214'/%3E%3Cg fill='%23f5c518'%3E%3Cellipse cx='32' cy='10' rx='5' ry='10' rx='5'/%3E%3Cellipse cx='32' cy='54' rx='5' ry='10'/%3E%3Cellipse cx='10' cy='32' rx='10' ry='5'/%3E%3Cellipse cx='54' cy='32' rx='10' ry='5'/%3E%3Cellipse cx='17' cy='17' rx='5' ry='10' transform='rotate(-45 17 17)'/%3E%3Cellipse cx='47' cy='47' rx='5' ry='10' transform='rotate(-45 47 47)'/%3E%3Cellipse cx='47' cy='17' rx='5' ry='10' transform='rotate(45 47 17)'/%3E%3Cellipse cx='17' cy='47' rx='5' ry='10' transform='rotate(45 17 47)'/%3E%3C/g%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='12' fill='%23704214'/%3E%3Cg fill='%23f5c518'%3E%3Cellipse cx='32' cy='10' rx='5' ry='10'/%3E%3Cellipse cx='32' cy='54' rx='5' ry='10'/%3E%3Cellipse cx='10' cy='32' rx='10' ry='5'/%3E%3Cellipse cx='54' cy='32' rx='10' ry='5'/%3E%3Cellipse cx='17' cy='17' rx='5' ry='10' transform='rotate(-45 17 17)'/%3E%3Cellipse cx='47' cy='47' rx='5' ry='10' transform='rotate(-45 47 47)'/%3E%3Cellipse cx='47' cy='17' rx='5' ry='10' transform='rotate(45 47 17)'/%3E%3Cellipse cx='17' cy='47' rx='5' ry='10' transform='rotate(45 17 47)'/%3E%3C/g%3E%3C/svg%3E" />
 </head>
 <body>
 
   <div class="stars" id="stars"></div>
 
-  <!-- Spinning sunflower header icon -->
-  <svg class="sunflower-icon reveal" width="52" height="52" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <g fill="#f5c518">
-      <ellipse cx="32" cy="9"  rx="5.5" ry="11"/>
-      <ellipse cx="32" cy="55" rx="5.5" ry="11"/>
-      <ellipse cx="9"  cy="32" rx="11"  ry="5.5"/>
-      <ellipse cx="55" cy="32" rx="11"  ry="5.5"/>
-      <ellipse cx="16" cy="16" rx="5.5" ry="11" transform="rotate(-45 16 16)"/>
-      <ellipse cx="48" cy="48" rx="5.5" ry="11" transform="rotate(-45 48 48)"/>
-      <ellipse cx="48" cy="16" rx="5.5" ry="11" transform="rotate(45 48 16)"/>
-      <ellipse cx="16" cy="48" rx="5.5" ry="11" transform="rotate(45 16 48)"/>
-    </g>
-    <circle cx="32" cy="32" r="13" fill="#704214"/>
-    <circle cx="32" cy="32" r="9"  fill="#3d2008"/>
-    <!-- seed dots -->
-    <circle cx="29" cy="29" r="1.2" fill="#704214"/>
-    <circle cx="32" cy="28" r="1.2" fill="#704214"/>
-    <circle cx="35" cy="29" r="1.2" fill="#704214"/>
-    <circle cx="28" cy="32" r="1.2" fill="#704214"/>
-    <circle cx="32" cy="32" r="1.2" fill="#704214"/>
-    <circle cx="36" cy="32" r="1.2" fill="#704214"/>
-    <circle cx="29" cy="35" r="1.2" fill="#704214"/>
-    <circle cx="32" cy="36" r="1.2" fill="#704214"/>
-    <circle cx="35" cy="35" r="1.2" fill="#704214"/>
-  </svg>
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!--  WELCOME SCREEN                                     -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div id="welcome-screen">
 
-  <h1 class="reveal">For You 🌻</h1>
-  <p class="subtitle reveal">a little something, every day</p>
+    <svg class="sunflower-icon welcome-sunflower" width="72" height="72" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g fill="#f5c518">
+        <ellipse cx="32" cy="9"  rx="5.5" ry="11"/>
+        <ellipse cx="32" cy="55" rx="5.5" ry="11"/>
+        <ellipse cx="9"  cy="32" rx="11"  ry="5.5"/>
+        <ellipse cx="55" cy="32" rx="11"  ry="5.5"/>
+        <ellipse cx="16" cy="16" rx="5.5" ry="11" transform="rotate(-45 16 16)"/>
+        <ellipse cx="48" cy="48" rx="5.5" ry="11" transform="rotate(-45 48 48)"/>
+        <ellipse cx="48" cy="16" rx="5.5" ry="11" transform="rotate(45 48 16)"/>
+        <ellipse cx="16" cy="48" rx="5.5" ry="11" transform="rotate(45 16 48)"/>
+      </g>
+      <circle cx="32" cy="32" r="13" fill="#704214"/>
+      <circle cx="32" cy="32" r="9"  fill="#3d2008"/>
+      <circle cx="29" cy="29" r="1.2" fill="#704214"/>
+      <circle cx="32" cy="28" r="1.2" fill="#704214"/>
+      <circle cx="35" cy="29" r="1.2" fill="#704214"/>
+      <circle cx="28" cy="32" r="1.2" fill="#704214"/>
+      <circle cx="32" cy="32" r="1.2" fill="#704214"/>
+      <circle cx="36" cy="32" r="1.2" fill="#704214"/>
+      <circle cx="29" cy="35" r="1.2" fill="#704214"/>
+      <circle cx="32" cy="36" r="1.2" fill="#704214"/>
+      <circle cx="35" cy="35" r="1.2" fill="#704214"/>
+    </svg>
 
-  <div class="countdown-box reveal">
-    <div class="countdown-label">next message unlocks in</div>
-    <div class="countdown-timer" id="countdown-timer">--:--:--</div>
+    <div class="welcome-box">
+      <p class="welcome-from">from me, to you</p>
+      <h1 class="welcome-title" id="welcome-title">For You 🌻</h1>
+
+      <!-- You can edit the text below directly in this file -->
+      <p class="welcome-body" id="welcome-message">
+        Every single day for 30 days, I've written something just for you.<br><br>
+        A thought, a memory, a feeling — something I want you to know.<br><br>
+        Open today's message, and come back tomorrow for the next one.<br><br>
+        This is all for you. Because you deserve to feel loved, every day.
+      </p>
+
+      <button class="enter-btn" id="enter-btn">
+        open today's message &nbsp;🌻
+      </button>
+    </div>
+
   </div>
 
-  <div class="day-grid reveal" id="day-grid"></div>
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!--  MAIN SCREEN                                        -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div id="main-screen" class="hidden">
 
-  <div class="card" id="card">
-
-    <!-- Each section gets reveal-child class; JS assigns delay via style -->
-    <div class="day-label reveal-child"  id="day-label"></div>
-    <div class="topic   reveal-child"    id="topic"></div>
-    <div class="reveal-child"            id="badges"></div>
-
-    <!-- 1. Photo -->
-    <div class="photo-wrap reveal-child" id="photo-wrap">
-      <img id="photo-img" src="" alt="" />
-      <div class="photo-caption" id="photo-caption"></div>
-    </div>
-
-    <!-- 2. Audio -->
-    <div class="audio-wrap reveal-child" id="audio-wrap">
-      <div class="audio-label">&#127908; hear my voice</div>
-      <audio id="audio-el" preload="none"></audio>
-      <div class="audio-controls">
-        <button class="play-btn" id="play-btn" aria-label="Play">&#9654;</button>
-        <div class="progress-wrap" id="progress-wrap">
-          <div class="progress-bar" id="progress-bar"></div>
-        </div>
-        <div class="time-display" id="time-display">0:00</div>
-      </div>
-    </div>
-
-    <!-- 3. Message text -->
-    <div class="message-body reveal-child" id="message-body"></div>
-
-    <!-- 4. Poem -->
-    <div class="poem-wrap reveal-child" id="poem-wrap">
-      <div class="poem-title" id="poem-title">a poem for you</div>
-      <div class="poem-body"  id="poem-body"></div>
-    </div>
-
-    <!-- 5. Questions -->
-    <div class="questions-wrap reveal-child" id="questions-wrap">
-      <div class="questions-divider"></div>
-      <div class="questions-header">things to think about</div>
-      <div class="questions-list" id="questions-list"></div>
-      <button class="reveal-btn" id="reveal-btn" aria-label="Reveal next question">
-        <span id="reveal-btn-text">&#10022; reveal a question</span>
+    <!-- Top bar -->
+    <div class="top-bar reveal">
+      <button class="welcome-return-btn" id="welcome-return-btn" aria-label="Back to welcome">
+        <svg width="28" height="28" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <g fill="#f5c518">
+            <ellipse cx="32" cy="9"  rx="4" ry="8"/>
+            <ellipse cx="32" cy="55" rx="4" ry="8"/>
+            <ellipse cx="9"  cy="32" rx="8" ry="4"/>
+            <ellipse cx="55" cy="32" rx="8" ry="4"/>
+            <ellipse cx="16" cy="16" rx="4" ry="8" transform="rotate(-45 16 16)"/>
+            <ellipse cx="48" cy="48" rx="4" ry="8" transform="rotate(-45 48 48)"/>
+            <ellipse cx="48" cy="16" rx="4" ry="8" transform="rotate(45 48 16)"/>
+            <ellipse cx="16" cy="48" rx="4" ry="8" transform="rotate(45 16 48)"/>
+          </g>
+          <circle cx="32" cy="32" r="10" fill="#704214"/>
+          <circle cx="32" cy="32" r="7"  fill="#3d2008"/>
+        </svg>
       </button>
+      <span class="top-bar-title">For You 🌻</span>
+      <div style="width:36px"></div><!-- spacer to center the title -->
+    </div>
+
+    <p class="subtitle reveal">a little something, every day</p>
+
+    <div class="countdown-box reveal">
+      <div class="countdown-label">next message unlocks in</div>
+      <div class="countdown-timer" id="countdown-timer">--:--:--</div>
+    </div>
+
+    <div class="day-grid reveal" id="day-grid"></div>
+
+    <div class="card" id="card">
+      <div class="day-label  reveal-child" id="day-label"></div>
+      <div class="topic      reveal-child" id="topic"></div>
+      <div class="            reveal-child" id="badges"></div>
+
+      <div class="photo-wrap reveal-child" id="photo-wrap">
+        <img id="photo-img" src="" alt="" />
+        <div class="photo-caption" id="photo-caption"></div>
+      </div>
+
+      <div class="audio-wrap reveal-child" id="audio-wrap">
+        <div class="audio-label">&#127908; hear my voice</div>
+        <audio id="audio-el" preload="none"></audio>
+        <div class="audio-controls">
+          <button class="play-btn" id="play-btn" aria-label="Play">&#9654;</button>
+          <div class="progress-wrap" id="progress-wrap">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+          <div class="time-display" id="time-display">0:00</div>
+        </div>
+      </div>
+
+      <div class="message-body reveal-child" id="message-body"></div>
+
+      <div class="poem-wrap reveal-child" id="poem-wrap">
+        <div class="poem-title" id="poem-title">a poem for you</div>
+        <div class="poem-body"  id="poem-body"></div>
+      </div>
+
+      <div class="questions-wrap reveal-child" id="questions-wrap">
+        <div class="questions-divider"></div>
+        <div class="questions-header">things to think about</div>
+        <div class="questions-list" id="questions-list"></div>
+        <button class="reveal-btn" id="reveal-btn" aria-label="Reveal next question">
+          <span id="reveal-btn-text">&#10022; reveal a question</span>
+        </button>
+      </div>
     </div>
 
   </div>

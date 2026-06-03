@@ -503,3 +503,179 @@ h1 {
   .card { padding: 26px 20px; }
   h1    { font-size: 1.35rem; }
 }
+
+
+/* ════════════════════════════════════════════════════════
+   WELCOME SCREEN
+   ════════════════════════════════════════════════════════ */
+
+#welcome-screen {
+  position: fixed;
+  inset: 0;
+  background: #0f0e00;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  z-index: 100;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+#welcome-screen.exiting {
+  animation: fadeOut 0.7s ease forwards;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1);    }
+  to   { opacity: 0; transform: scale(0.97); }
+}
+
+.welcome-sunflower {
+  animation: slowSpin 18s linear infinite, floatUp 1s ease 0.2s both;
+  margin-bottom: 28px;
+}
+
+@keyframes floatUp {
+  from { opacity: 0; transform: translateY(20px) rotate(0deg); }
+  to   { opacity: 1; transform: translateY(0)    rotate(0deg); }
+}
+
+.welcome-box {
+  max-width: 480px;
+  width: 100%;
+  background: rgba(245, 197, 24, 0.05);
+  border: 1px solid rgba(245, 197, 24, 0.18);
+  border-radius: 24px;
+  padding: 40px 36px;
+  text-align: center;
+  animation: floatUp 0.9s ease 0.35s both;
+}
+
+.welcome-from {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: #a08c30;
+  text-transform: uppercase;
+  font-family: sans-serif;
+  margin-bottom: 10px;
+}
+
+.welcome-title {
+  font-size: 2rem;
+  font-weight: normal;
+  color: #f5c518;
+  letter-spacing: 0.06em;
+  margin-bottom: 24px;
+}
+
+.welcome-body {
+  font-size: 1rem;
+  line-height: 1.95;
+  color: #e8ddb0;
+  margin-bottom: 32px;
+}
+
+.enter-btn {
+  display: inline-block;
+  padding: 13px 28px;
+  background: rgba(245, 197, 24, 0.1);
+  border: 1.5px solid rgba(245, 197, 24, 0.35);
+  border-radius: 14px;
+  color: #f5c518;
+  font-size: 0.9rem;
+  font-family: 'Georgia', serif;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.enter-btn:hover {
+  background: rgba(245, 197, 24, 0.18);
+  border-color: #f5c518;
+  transform: scale(1.03);
+}
+
+/* ════════════════════════════════════════════════════════
+   MAIN SCREEN
+   ════════════════════════════════════════════════════════ */
+
+#main-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 640px;
+  padding-top: 12px;
+}
+
+#main-screen.hidden {
+  display: none;
+}
+
+#main-screen.entering {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+/* ── Top bar ── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 560px;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+
+.top-bar-title {
+  font-size: 1.1rem;
+  color: #f5c518;
+  letter-spacing: 0.06em;
+  font-family: 'Georgia', serif;
+}
+
+.welcome-return-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(245, 197, 24, 0.22);
+  background: rgba(245, 197, 24, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.welcome-return-btn:hover {
+  background: rgba(245, 197, 24, 0.14);
+  border-color: rgba(245, 197, 24, 0.5);
+  transform: scale(1.08) rotate(15deg);
+}
+
+.welcome-return-btn svg {
+  animation: slowSpin 18s linear infinite;
+}
+
+/* ── Today highlight on day grid ── */
+.day-btn.today {
+  border-color: #f5c518;
+  color: #0f0e00;
+  -webkit-text-fill-color: #0f0e00;
+  background: #f5c518;
+  box-shadow: 0 0 16px rgba(245, 197, 24, 0.45);
+  font-weight: bold;
+}
+
+.day-btn.today:hover {
+  background: #ffd740;
+  transform: scale(1.12);
+}

@@ -4,6 +4,35 @@ const START_DATE = '2026-06-01';
 
 let data = {};
 
+// ── Screen switching ──────────────────────────────────────
+function showMain() {
+  const welcome = document.getElementById('welcome-screen');
+  const main    = document.getElementById('main-screen');
+
+  welcome.classList.add('exiting');
+  setTimeout(() => {
+    welcome.style.display = 'none';
+    main.classList.remove('hidden');
+    main.classList.add('entering');
+    // Trigger reveals now that main is visible
+    triggerVisibleReveals();
+  }, 680);
+}
+
+function showWelcome() {
+  const welcome = document.getElementById('welcome-screen');
+  const main    = document.getElementById('main-screen');
+
+  main.classList.add('hidden');
+  main.classList.remove('entering');
+  welcome.style.display = 'flex';
+  welcome.classList.remove('exiting');
+  welcome.style.animation = 'none';
+  requestAnimationFrame(() => {
+    welcome.style.animation = '';
+  });
+}
+
 // ── Floating petal particles ──────────────────────────────
 function buildPetals() {
   const container = document.getElementById('stars');
@@ -23,7 +52,6 @@ function buildPetals() {
     ].join('; ');
     container.appendChild(p);
   }
-  // Tiny gold dots (like seeds drifting)
   for (let i = 0; i < 55; i++) {
     const s = document.createElement('div');
     s.className = 'star';
@@ -41,29 +69,36 @@ function buildPetals() {
   }
 }
 
-// ── Scroll-reveal observer ────────────────────────────────
+// ── Scroll-reveal ─────────────────────────────────────────
+let revealObserver = null;
+
 function initScrollReveal() {
-  const observer = new IntersectionObserver(
+  if (revealObserver) revealObserver.disconnect();
+  revealObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
+        if (entry.isIntersecting) entry.target.classList.add('visible');
       });
     },
-    { threshold: 0.12 }
+    { threshold: 0.1 }
   );
-
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-  return observer;
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 }
 
-// Stagger reveal-child elements inside the card
+function triggerVisibleReveals() {
+  initScrollReveal();
+  setTimeout(() => {
+    document.querySelectorAll('.reveal').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) el.classList.add('visible');
+    });
+  }, 80);
+}
+
 function revealCardChildren() {
   const children = document.querySelectorAll('.reveal-child');
   children.forEach((el, i) => {
     el.style.transitionDelay = `${i * 110}ms`;
-    // Small timeout to let display:block kick in before transition
     setTimeout(() => el.classList.add('visible'), 60 + i * 110);
   });
 }
@@ -95,6 +130,7 @@ function buildGrid(today) {
   grid.innerHTML = '';
   for (let d = 1; d <= 30; d++) {
     const btn = document.createElement('button');
+    // today gets its own class; active will be set on click
     btn.className = 'day-btn'
       + (d === today ? ' today'  : '')
       + (d > today   ? ' locked' : '');
@@ -114,7 +150,6 @@ function setActiveButton(day) {
 // ── Card reset ────────────────────────────────────────────
 function resetCard() {
   hideCardChildren();
-
   document.getElementById('photo-wrap').style.display     = 'none';
   document.getElementById('audio-wrap').style.display     = 'none';
   document.getElementById('message-body').style.display   = 'none';
@@ -125,7 +160,6 @@ function resetCard() {
   document.getElementById('poem-body').textContent        = '';
   document.getElementById('photo-caption').textContent    = '';
   document.getElementById('questions-list').innerHTML     = '';
-
   const audio = document.getElementById('audio-el');
   audio.pause();
   audio.src = '';
@@ -160,11 +194,9 @@ function renderAudio(entry) {
   const progressBar  = document.getElementById('progress-bar');
   const progressWrap = document.getElementById('progress-wrap');
   const timeDisplay  = document.getElementById('time-display');
-
   audioEl.src = entry.audio;
   audioEl.load();
   document.getElementById('audio-wrap').style.display = 'block';
-
   playBtn.onclick = () => {
     if (audioEl.paused) { audioEl.play(); playBtn.innerHTML = '&#9646;&#9646;'; }
     else                { audioEl.pause(); playBtn.innerHTML = '&#9654;'; }
@@ -208,18 +240,15 @@ function renderQuestions(entry) {
   const btnText   = document.getElementById('reveal-btn-text');
   const questions = entry.questions.slice(0, 3);
   let revealed    = 0;
-
-  const labels = [
+  const labels    = [
     '&#10022; reveal a question',
     '&#10022; reveal another',
     '&#10022; one more'
   ];
-
-  wrap.style.display   = 'block';
-  revealBtn.className  = 'reveal-btn';
-  btnText.innerHTML    = labels[0];
-
-  revealBtn.onclick = () => {
+  wrap.style.display  = 'block';
+  revealBtn.className = 'reveal-btn';
+  btnText.innerHTML   = labels[0];
+  revealBtn.onclick   = () => {
     if (revealed >= questions.length) return;
     const item = document.createElement('div');
     item.className = 'question-item';
@@ -243,13 +272,10 @@ function renderQuestions(entry) {
 function showMessage(day) {
   setActiveButton(day);
   resetCard();
-
   const entry = data[day];
   const card  = document.getElementById('card');
-
   document.getElementById('day-label').textContent = `Day ${day}`;
   card.style.display = 'block';
-
   if (!entry) {
     document.getElementById('topic').textContent = '';
     const body = document.getElementById('message-body');
@@ -259,16 +285,13 @@ function showMessage(day) {
     revealCardChildren();
     return;
   }
-
   document.getElementById('topic').textContent = entry.topic || '';
-
   renderBadges(entry);
   renderPhoto(entry);
   renderAudio(entry);
   renderMessage(entry);
   renderPoem(entry);
   renderQuestions(entry);
-
   card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   revealCardChildren();
 }
@@ -300,15 +323,10 @@ function startCountdown(today) {
 // ── Init ──────────────────────────────────────────────────
 async function init() {
   buildPetals();
-  initScrollReveal();
 
-  // Trigger .reveal elements already in view on load
-  setTimeout(() => {
-    document.querySelectorAll('.reveal').forEach(el => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight) el.classList.add('visible');
-    });
-  }, 100);
+  // Button listeners
+  document.getElementById('enter-btn').addEventListener('click', showMain);
+  document.getElementById('welcome-return-btn').addEventListener('click', showWelcome);
 
   try {
     const res  = await fetch('messages.json');
@@ -322,10 +340,10 @@ async function init() {
   buildGrid(today);
   startCountdown(today);
 
-  const unlocked = document.querySelectorAll('.day-btn:not(.locked)');
-  if (unlocked.length) {
-    showMessage(parseInt(unlocked[unlocked.length - 1].textContent));
-  }
+  // Pre-select today so it's ready when she enters
+  // (card won't show until main screen is visible)
+  const todayBtn = document.querySelector('.day-btn.today');
+  if (todayBtn) todayBtn.click();
 }
 
 init();
