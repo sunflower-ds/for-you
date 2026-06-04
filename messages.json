@@ -51,6 +51,17 @@
         "Is it a major concern of yours that you will get laugh lines if you date me?"
       ],
       "signature": "Keep smiling, Suraj"
+    },
+    {
+      "day": 5,
+      "topic": "Passion",
+      "photo: "https://i.ibb.co/PzfX46NV/IMG-1018.jpg",
+      "message: "I love how passionate you are. TODO.",
+      "questions": [
+        "What do you wish you were more passionate about?",
+        "Do you think I am a passionate person?",
+        "So do you like the picture?"
+      ]
     }
   ]
 }
