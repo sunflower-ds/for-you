@@ -9,7 +9,8 @@
 </head>
 <body>
 
-  <div class="stars" id="stars"></div>
+  <!-- Parallax canvas — sits behind everything -->
+  <canvas id="parallax-canvas"></canvas>
 
   <!-- ══════════════════════════════════════════ -->
   <!--  WELCOME SCREEN                            -->
@@ -89,19 +90,12 @@
       <div class="countdown-timer" id="countdown-timer">--:--:--</div>
     </div>
 
-    <!-- ── Vine ── -->
     <div class="vine-container reveal">
       <div class="vine-scroll">
-        <svg id="vine-svg"
-             viewBox="0 0 620 280"
-             xmlns="http://www.w3.org/2000/svg"
-             width="620" height="280"
-             aria-label="30-day progress vine">
-        </svg>
+        <svg id="vine-svg" viewBox="0 0 620 280" xmlns="http://www.w3.org/2000/svg" width="620" height="280" aria-label="30-day progress vine"></svg>
       </div>
     </div>
 
-    <!-- ── Message card ── -->
     <div class="card" id="card">
       <div class="day-label  reveal-child" id="day-label"></div>
       <div class="topic      reveal-child" id="topic"></div>
@@ -141,7 +135,6 @@
       </div>
 
       <div class="signature reveal-child" id="signature"></div>
-
     </div>
 
   </div>
