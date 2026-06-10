@@ -103,6 +103,18 @@
       ],
       "signature": "Your childish friend, Suraj"
 
+    },
+    {
+      "day": 9,
+      "topic": "Courage",
+      "photo":"https://i.ibb.co/4nz4SjDx/IMG-2300.jpg",
+      "audio":"https://res.cloudinary.com/drd77hzgt/video/upload/v1781125149/New_Recording_2_2_bibsfn.m4a",
+      "questions": [
+        "Honestly, do you think I'm courageous?",
+        "Do you think your courage has increased or decreased since you moved to NY?",
+        "So do we keep the audio only format, or should I go back?"
+      ],
+      "signature": "Stay courageous, Suraj"
     }
   ]
 }
