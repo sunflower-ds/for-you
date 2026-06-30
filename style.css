@@ -52,7 +52,11 @@ body {
 #vine-svg { display:block; }
 
 /* ── Message card ── */
-.card      { max-width:580px; width:100%; background:rgba(15,14,0,.7); border:1px solid rgba(245,197,24,.16); border-radius:22px; padding:36px 32px; display:none; backdrop-filter: blur(6px); }
+.card      { max-width:580px; width:100%; background:rgba(15,14,0,.7); border:1px solid rgba(245,197,24,.16); border-radius:22px; padding:36px 32px; display:none; backdrop-filter: blur(6px); transition: box-shadow 0.6s ease, border-color 0.6s ease; }
+.card.grand-finale {
+  border-color: rgba(245,197,24,.45);
+  box-shadow: 0 0 50px rgba(245,197,24,0.18), 0 0 100px rgba(245,197,24,0.08);
+}
 .day-label { font-size:.7rem; letter-spacing:.16em; color:#a08c30; text-transform:uppercase; margin-bottom:5px; font-family:sans-serif; }
 .topic     { font-size:1.55rem; color:#f5c518; margin-bottom:24px; }
 .topic::before { content:'🌻 '; font-size:1.1rem; }

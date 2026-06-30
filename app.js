@@ -7,6 +7,45 @@ let data = {};
 // ══════════════════════════════════════════════════════════
 //  PARALLAX BACKGROUND
 // ══════════════════════════════════════════════════════════
+let parallaxState = { grand: false, layers: null };
+
+function buildLayers(grand) {
+  // Four depth layers — slowest (far) to fastest (near)
+  // Grand mode roughly triples flower/petal counts and boosts opacity for a fuller, richer field
+  const mult = grand ? 2.6 : 1;
+  const aMul = grand ? 1.5 : 1;
+  const layers = [
+    { items: [], speed: 0.012, count: Math.round(5  * mult), sizeMin: 20, sizeMax: 32, alpha: Math.min(0.10 * aMul, 0.22) },
+    { items: [], speed: 0.030, count: Math.round(10 * mult), sizeMin: 9,  sizeMax: 17, alpha: Math.min(0.18 * aMul, 0.32) },
+    { items: [], speed: 0.058, count: Math.round(20 * mult), sizeMin: 3,  sizeMax: 7,  alpha: Math.min(0.28 * aMul, 0.45) },
+    { items: [], speed: 0.095, count: Math.round(32 * mult), sizeMin: 1,  sizeMax: 2.5,alpha: Math.min(0.40 * aMul, 0.58) },
+  ];
+
+  function rand(min, max) { return min + Math.random() * (max - min); }
+
+  layers.forEach(layer => {
+    for (let i = 0; i < layer.count; i++) {
+      layer.items.push({
+        bx: rand(0, 1),
+        by: rand(0, 1),
+        size: rand(layer.sizeMin, layer.sizeMax),
+        rot: rand(0, Math.PI * 2),
+        rotSpeed: rand(-0.003, 0.003),
+        // Grand mode skews toward more full sunflowers, fewer plain petals
+        isPetal: Math.random() > (grand ? 0.32 : 0.45),
+      });
+    }
+  });
+
+  return layers;
+}
+
+function setParallaxGrand(grand) {
+  if (parallaxState.grand === grand) return;
+  parallaxState.grand = grand;
+  parallaxState.layers = buildLayers(grand);
+}
+
 function initParallax() {
   const canvas = document.getElementById('parallax-canvas');
   const ctx    = canvas.getContext('2d');
@@ -22,28 +61,7 @@ function initParallax() {
   resize();
   window.addEventListener('resize', resize);
 
-  // Four depth layers — slowest (far) to fastest (near)
-  const LAYERS = [
-    { items: [], speed: 0.012, count: 5,  sizeMin: 20, sizeMax: 30, alpha: 0.10 },
-    { items: [], speed: 0.030, count: 10, sizeMin: 9,  sizeMax: 16, alpha: 0.18 },
-    { items: [], speed: 0.058, count: 20, sizeMin: 3,  sizeMax: 7,  alpha: 0.28 },
-    { items: [], speed: 0.095, count: 32, sizeMin: 1,  sizeMax: 2.5,alpha: 0.40 },
-  ];
-
-  function rand(min, max) { return min + Math.random() * (max - min); }
-
-  LAYERS.forEach(layer => {
-    for (let i = 0; i < layer.count; i++) {
-      layer.items.push({
-        bx: rand(0, 1),
-        by: rand(0, 1),
-        size: rand(layer.sizeMin, layer.sizeMax),
-        rot: rand(0, Math.PI * 2),
-        rotSpeed: rand(-0.003, 0.003),
-        isPetal: Math.random() > 0.45,
-      });
-    }
-  });
+  parallaxState.layers = buildLayers(false);
 
   function drawSunflower(x, y, r, alpha) {
     ctx.save();
@@ -95,7 +113,7 @@ function initParallax() {
     const ox = (mouse.x - 0.5) * 2;
     const oy = (mouse.y - 0.5) * 2;
 
-    LAYERS.forEach(layer => {
+    parallaxState.layers.forEach(layer => {
       layer.items.forEach(item => {
         item.rot += item.rotSpeed * dt;
         const sx = ((item.bx + ox * layer.speed * 2 + 10) % 1 + 1) % 1;
@@ -429,11 +447,13 @@ function renderSignature(entry) {
 }
 
 function showMessage(day) {
+  setParallaxGrand(day === 30);
   resetCard();
   const entry = data[day];
   const card  = document.getElementById('card');
   document.getElementById('day-label').textContent = `Day ${day}`;
   card.style.display = 'block';
+  card.classList.toggle('grand-finale', day === 30);
   if (!entry) {
     document.getElementById('topic').textContent = '';
     const body = document.getElementById('message-body');
