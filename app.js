@@ -7,7 +7,8 @@ let data = {};
 
 // ── Birthday helpers ──────────────────────────────────────
 function isBirthdayToday() {
-  return new Date() >= new Date(BIRTHDAY);
+  return true;
+  // return new Date() >= new Date(BIRTHDAY);
 }
 
 function birthdayCountdownStr() {
