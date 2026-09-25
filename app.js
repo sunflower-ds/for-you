@@ -589,6 +589,46 @@ function buildFilmstrip(photos) {
   });
 }
 
+function renderBirthdayAudio(url) {
+  if (!url) {
+    document.getElementById('birthday-audio-wrap').style.display = 'none';
+    return;
+  }
+
+  const audioEl      = document.getElementById('birthday-audio-el');
+  const playBtn      = document.getElementById('birthday-play-btn');
+  const progressBar  = document.getElementById('birthday-progress-bar');
+  const progressWrap = document.getElementById('birthday-progress-wrap');
+  const timeDisplay  = document.getElementById('birthday-time-display');
+
+  audioEl.src = url;
+  audioEl.load();
+  document.getElementById('birthday-audio-wrap').style.display = 'block';
+
+  playBtn.onclick = () => {
+    if (audioEl.paused) { audioEl.play(); playBtn.innerHTML = '&#9646;&#9646;'; }
+    else                { audioEl.pause(); playBtn.innerHTML = '&#9654;'; }
+  };
+
+  audioEl.ontimeupdate = () => {
+    if (!audioEl.duration) return;
+    progressBar.style.width = (audioEl.currentTime / audioEl.duration * 100) + '%';
+    timeDisplay.textContent = formatTime(audioEl.currentTime);
+  };
+
+  audioEl.onended = () => {
+    playBtn.innerHTML = '&#9654;';
+    progressBar.style.width = '0%';
+    audioEl.currentTime = 0;
+    setTimeout(() => { timeDisplay.textContent = '0:00'; }, 300);
+  };
+
+  progressWrap.onclick = e => {
+    const r = progressWrap.getBoundingClientRect();
+    audioEl.currentTime = ((e.clientX - r.left) / r.width) * audioEl.duration;
+  };
+}
+
 function openBirthdayCard() {
   const card   = document.getElementById('birthday-card');
   const shower = document.getElementById('petal-shower-canvas');
@@ -609,6 +649,8 @@ function openBirthdayCard() {
   if (bday.message) { msg.textContent = bday.message; msg.style.display = 'block'; }
   else              { msg.style.display = 'none'; }
 
+  renderBirthdayAudio(bday.audio);
+  
   if (bday.photos && bday.photos.length) {
     buildFilmstrip(bday.photos);
     document.getElementById('filmstrip-wrap').style.display = 'block';
