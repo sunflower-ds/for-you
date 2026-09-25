@@ -594,6 +594,10 @@ function openBirthdayCard() {
   const shower = document.getElementById('petal-shower-canvas');
   const bday   = data['birthday'];
 
+  // Hide the day message card when birthday opens
+  const dayCard = document.getElementById('card');
+  dayCard.style.display = 'none';
+
   card.classList.add('open');
   card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   setTimeout(() => startPetalShower(shower), 300);
