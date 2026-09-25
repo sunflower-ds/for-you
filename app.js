@@ -1,24 +1,8 @@
 // ── CONFIG ────────────────────────────────────────────────
 const START_DATE = '2026-06-01';
-const BIRTHDAY   = '2026-09-26T04:00:00Z'; // Midnight EST = 9 PM Pacific = 4 AM UTC
 // ──────────────────────────────────────────────────────────
 
 let data = {};
-
-// ── Birthday helpers ──────────────────────────────────────
-function isBirthdayToday() {
-  return new Date() >= new Date(BIRTHDAY);
-}
-
-function birthdayCountdownStr() {
-  const diff = new Date(BIRTHDAY) - new Date();
-  if (diff <= 0) return null;
-  const d = Math.floor(diff / 86400000);
-  const h = Math.floor((diff % 86400000) / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
-  if (d > 0) return `unlocks in ${d}d ${h}h`;
-  return `unlocks in ${h}h ${m}m`;
-}
 
 // ══════════════════════════════════════════════════════════
 //  PARALLAX BACKGROUND
@@ -26,6 +10,8 @@ function birthdayCountdownStr() {
 let parallaxState = { grand: false, layers: null };
 
 function buildLayers(grand) {
+  // Four depth layers — slowest (far) to fastest (near)
+  // Grand mode roughly triples flower/petal counts and boosts opacity for a fuller, richer field
   const mult = grand ? 2.6 : 1;
   const aMul = grand ? 1.5 : 1;
   const layers = [
@@ -45,6 +31,7 @@ function buildLayers(grand) {
         size: rand(layer.sizeMin, layer.sizeMax),
         rot: rand(0, Math.PI * 2),
         rotSpeed: rand(-0.003, 0.003),
+        // Grand mode skews toward more full sunflowers, fewer plain petals
         isPetal: Math.random() > (grand ? 0.32 : 0.45),
       });
     }
@@ -55,7 +42,7 @@ function buildLayers(grand) {
 
 function setParallaxGrand(grand) {
   if (parallaxState.grand === grand) return;
-  parallaxState.grand  = grand;
+  parallaxState.grand = grand;
   parallaxState.layers = buildLayers(grand);
 }
 
@@ -117,6 +104,7 @@ function initParallax() {
     const dt = Math.min((ts - lastTime) / 16, 3);
     lastTime = ts;
 
+    // Smooth mouse follow
     mouse.x += (target.x - mouse.x) * 0.05 * dt;
     mouse.y += (target.y - mouse.y) * 0.05 * dt;
 
@@ -141,17 +129,20 @@ function initParallax() {
     requestAnimationFrame(frame);
   }
 
+  // Track mouse across the whole page
   document.addEventListener('mousemove', e => {
     target.x = e.clientX / window.innerWidth;
     target.y = e.clientY / window.innerHeight;
   });
 
+  // On mobile, use device tilt if available
   window.addEventListener('deviceorientation', e => {
     if (e.gamma == null) return;
     target.x = Math.min(Math.max((e.gamma + 45) / 90, 0), 1);
     target.y = Math.min(Math.max((e.beta  + 45) / 90, 0), 1);
   });
 
+  // Gentle auto-drift when no input
   let driftAngle = 0;
   setInterval(() => {
     driftAngle += 0.008;
@@ -192,7 +183,7 @@ function drawVine(today) {
   const svg = document.getElementById('vine-svg');
   if (!svg) return;
   svg.innerHTML = '';
-  const ns        = 'http://www.w3.org/2000/svg';
+  const ns = 'http://www.w3.org/2000/svg';
   const positions = getVinePositions();
 
   function el(tag, attrs, parent) {
@@ -204,7 +195,6 @@ function drawVine(today) {
 
   function lerp(a, b, t) { return a + (b - a) * t; }
 
-  // Vine segments
   for (let i = 0; i < positions.length - 1; i++) {
     const unlocked = i < today;
     const { x: x1, y: y1, row: r1 } = positions[i];
@@ -213,13 +203,7 @@ function drawVine(today) {
     const d  = r1 === r2
       ? `M ${x1} ${y1} C ${mx} ${y1-10}, ${mx} ${y2-10}, ${x2} ${y2}`
       : `M ${x1} ${y1} C ${x1} ${(y1+y2)/2}, ${x2} ${(y1+y2)/2}, ${x2} ${y2}`;
-    el('path', {
-      d,
-      stroke: unlocked ? '#4a6a1a' : '#2a3a0a',
-      'stroke-width': unlocked ? '2.5' : '1.8',
-      fill: 'none', 'stroke-linecap': 'round',
-      opacity: unlocked ? '1' : '0.35'
-    });
+    el('path', { d, stroke: unlocked ? '#4a6a1a' : '#2a3a0a', 'stroke-width': unlocked ? '2.5' : '1.8', fill: 'none', 'stroke-linecap': 'round', opacity: unlocked ? '1' : '0.35' });
     if (unlocked && i % 2 === 0 && r1 === r2) {
       const lx = lerp(x1, x2, 0.45);
       const ly = lerp(y1, y2, 0.45) - 9;
@@ -228,12 +212,11 @@ function drawVine(today) {
     }
   }
 
-  // Flowers
   for (let d = 1; d <= VINE_TOTAL; d++) {
-    const { x, y } = positions[d - 1];
-    const unlocked = d <= today;
-    const isToday  = d === today;
-    const dateNum  = getDayDate(d).getDate().toString();
+    const { x, y }  = positions[d - 1];
+    const unlocked  = d <= today;
+    const isToday   = d === today;
+    const dateNum   = getDayDate(d).getDate().toString();
     const g = el('g', { style: unlocked ? 'cursor:pointer' : 'cursor:default', transform: `translate(${x},${y})` });
     if (unlocked) g.addEventListener('click', () => showMessage(d));
 
@@ -359,8 +342,7 @@ function formatTime(seconds) {
 function resetCard() {
   hideCardChildren();
   ['photo-wrap','audio-wrap','message-body','poem-wrap','questions-wrap','signature'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
+    document.getElementById(id).style.display = 'none';
   });
   document.getElementById('badges').innerHTML          = '';
   document.getElementById('message-body').textContent  = '';
@@ -509,169 +491,6 @@ function startCountdown(today) {
 }
 
 // ══════════════════════════════════════════════════════════
-//  BIRTHDAY PETAL SHOWER
-// ══════════════════════════════════════════════════════════
-function startPetalShower(canvas) {
-  const ctx    = canvas.getContext('2d');
-  const petals = [];
-  let W = canvas.offsetWidth;
-  let H = canvas.offsetHeight;
-  canvas.width  = W;
-  canvas.height = H;
-
-  for (let i = 0; i < 80; i++) {
-    petals.push({
-      x:     Math.random() * W,
-      y:     Math.random() * H * -1,
-      size:  Math.random() * 7 + 4,
-      speed: Math.random() * 1.8 + 0.8,
-      drift: (Math.random() - 0.5) * 0.8,
-      rot:   Math.random() * Math.PI * 2,
-      rotS:  (Math.random() - 0.5) * 0.06,
-      color: Math.random() > 0.45 ? '#f5c518' : '#ffb8b8',
-      alpha: Math.random() * 0.6 + 0.3,
-    });
-  }
-
-  let running = true;
-  function frame() {
-    if (!running) return;
-    ctx.clearRect(0, 0, W, H);
-    petals.forEach(p => {
-      p.y += p.speed; p.x += p.drift; p.rot += p.rotS;
-      if (p.y > H + 20) { p.y = -10; p.x = Math.random() * W; }
-      ctx.save();
-      ctx.globalAlpha = p.alpha;
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.beginPath();
-      ctx.ellipse(0, 0, p.size * 0.45, p.size, 0, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-      ctx.restore();
-    });
-    requestAnimationFrame(frame);
-  }
-  frame();
-
-  setTimeout(() => {
-    let opacity = 1;
-    const fade = setInterval(() => {
-      opacity -= 0.04;
-      canvas.style.opacity = Math.max(opacity, 0);
-      if (opacity <= 0) {
-        clearInterval(fade);
-        running = false;
-        ctx.clearRect(0, 0, W, H);
-        canvas.style.opacity = 1;
-      }
-    }, 60);
-  }, 6000);
-}
-
-// ══════════════════════════════════════════════════════════
-//  BIRTHDAY SECTION
-// ══════════════════════════════════════════════════════════
-function buildFilmstrip(photos) {
-  const strip = document.getElementById('filmstrip');
-  strip.innerHTML = '';
-
-  // Mouse drag to scroll
-  let isDown = false, startX, scrollLeft;
-  strip.addEventListener('mousedown',  e => { isDown = true; startX = e.pageX - strip.offsetLeft; scrollLeft = strip.scrollLeft; });
-  strip.addEventListener('mouseleave', () => isDown = false);
-  strip.addEventListener('mouseup',    () => isDown = false);
-  strip.addEventListener('mousemove',  e => {
-    if (!isDown) return;
-    e.preventDefault();
-    strip.scrollLeft = scrollLeft - (e.pageX - strip.offsetLeft - startX);
-  });
-
-  photos.forEach(p => {
-    const frame = document.createElement('div');
-    frame.className = 'filmstrip-photo';
-    const img = document.createElement('img');
-    img.src = p.url; img.alt = p.caption || ''; img.loading = 'lazy';
-    frame.appendChild(img);
-    if (p.caption) {
-      const cap = document.createElement('div');
-      cap.className = 'film-caption';
-      cap.textContent = p.caption;
-      frame.appendChild(cap);
-    }
-    strip.appendChild(frame);
-  });
-}
-
-function openBirthdayCard() {
-  const card   = document.getElementById('birthday-card');
-  const shower = document.getElementById('petal-shower-canvas');
-  const bday   = data['birthday'];
-
-  card.classList.add('open');
-  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setTimeout(() => startPetalShower(shower), 300);
-  setParallaxGrand(true);
-
-  if (!bday) return;
-
-  const msg = document.getElementById('birthday-message');
-  if (bday.message) { msg.textContent = bday.message; msg.style.display = 'block'; }
-  else              { msg.style.display = 'none'; }
-
-  if (bday.photos && bday.photos.length) {
-    buildFilmstrip(bday.photos);
-    document.getElementById('filmstrip-wrap').style.display = 'block';
-  } else {
-    document.getElementById('filmstrip-wrap').style.display = 'none';
-  }
-
-  if (bday.poem) {
-    document.getElementById('birthday-poem-title').textContent  = bday.poem_title || 'for you';
-    document.getElementById('birthday-poem-body').textContent   = bday.poem;
-    document.getElementById('birthday-poem-wrap').style.display = 'block';
-  }
-
-  if (bday.signature) {
-    const sig = document.getElementById('birthday-signature');
-    sig.textContent   = '— ' + bday.signature;
-    sig.style.display = 'block';
-  }
-
-  const children = document.querySelectorAll('#birthday-card .reveal-child');
-  children.forEach((el, i) => {
-    el.style.transitionDelay = `${i * 130}ms`;
-    setTimeout(() => el.classList.add('visible'), 80 + i * 130);
-  });
-}
-
-function initBirthdayBtn() {
-  const btn     = document.getElementById('birthday-btn');
-  const btnText = document.getElementById('birthday-btn-text');
-  const btnSub  = document.getElementById('birthday-btn-sub');
-
-  if (!btn) return;
-
-  if (isBirthdayToday()) {
-    btn.classList.add('unlocked');
-    btnText.textContent = 'happy birthday 🎂';
-    btnSub.textContent  = 'September 26th — a special message for you';
-    btn.addEventListener('click', openBirthdayCard);
-  } else {
-    btn.classList.add('locked');
-    btnText.textContent = 'a birthday surprise';
-    function updateBdaySub() {
-      const cd = birthdayCountdownStr();
-      btnSub.innerHTML = cd
-        ? `September 26th &nbsp;·&nbsp; <span class="birthday-countdown">${cd}</span>`
-        : 'September 26th';
-    }
-    updateBdaySub();
-    setInterval(updateBdaySub, 60000);
-  }
-}
-
-// ══════════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════════
 async function init() {
@@ -684,16 +503,14 @@ async function init() {
     const res  = await fetch('messages.json');
     const json = await res.json();
     json.days.forEach(d => { data[d.day] = d; });
-    if (json.birthday) data['birthday'] = json.birthday;
   } catch (e) {
     console.warn('Could not load messages.json');
   }
 
   const today = getDayNumber();
   drawVine(today);
-  startCountdown(today);
+  // startCountdown(today); // commented out for testing
   showMessage(today);
-  initBirthdayBtn();
 }
 
 init();
